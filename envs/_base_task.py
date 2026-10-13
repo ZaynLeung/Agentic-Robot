@@ -1646,20 +1646,57 @@ class Base_Task(gym.Env):
         
         elif action_type == 'ee':
 
-            left_result = self.robot.left_plan_path(left_arm_actions[0])
-            right_result = self.robot.right_plan_path(right_arm_actions[0])
+            left_target_pose = left_arm_actions[0]
+            right_target_pose = right_arm_actions[0]
+
+            if DEBUG_EE and self.take_action_cnt < DEBUG_EE_MAX_STEP:
+                print(
+                    "\n[DEBUG_EE] step="
+                    + str(self.take_action_cnt + 1)
+                    + " left_target_pose="
+                    + np.array2string(np.asarray(left_target_pose), precision=4, suppress_small=True)
+                    + " right_target_pose="
+                    + np.array2string(np.asarray(right_target_pose), precision=4, suppress_small=True)
+                )
+
+            left_result = self.robot.left_plan_path(left_target_pose)
+            right_result = self.robot.right_plan_path(right_target_pose)
+
+            if DEBUG_EE and self.take_action_cnt < DEBUG_EE_MAX_STEP:
+                left_status = left_result.get("status") if isinstance(left_result, dict) else None
+                right_status = right_result.get("status") if isinstance(right_result, dict) else None
+                print("[DEBUG_EE] left_status=" + str(left_status) + " right_status=" + str(right_status))
+                if isinstance(left_result, dict) and left_result.get("status") == "Success":
+                    left_pos = np.asarray(left_result.get("position"))
+                    print(
+                        "[DEBUG_EE] left_qpos0="
+                        + np.array2string(left_pos[0], precision=4, suppress_small=True)
+                        + " left_qposT="
+                        + np.array2string(left_pos[-1], precision=4, suppress_small=True)
+                        + " left_pos_shape="
+                        + str(tuple(left_pos.shape))
+                    )
+                if isinstance(right_result, dict) and right_result.get("status") == "Success":
+                    right_pos = np.asarray(right_result.get("position"))
+                    print(
+                        "[DEBUG_EE] right_qpos0="
+                        + np.array2string(right_pos[0], precision=4, suppress_small=True)
+                        + " right_qposT="
+                        + np.array2string(right_pos[-1], precision=4, suppress_small=True)
+                        + " right_pos_shape="
+                        + str(tuple(right_pos.shape))
+                    )
+
             if left_result["status"] != "Success":
                 left_n_step = 50
                 topp_left_flag = False
-                # print("left fail")
-            else: 
+            else:
                 left_n_step = left_result["position"].shape[0]
                 topp_left_flag = True
-            
+
             if right_result["status"] != "Success":
                 right_n_step = 50
                 topp_right_flag = False
-                # print("right fail")
             else:
                 right_n_step = right_result["position"].shape[0]
                 topp_right_flag = True

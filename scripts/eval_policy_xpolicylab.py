@@ -30,6 +30,7 @@ for path in (ROBOTWIN_ROOT, ROBOTWIN_ROOT / "scripts", ROBOTWIN_ROOT / "descript
         sys.path.insert(0, path_str)
 
 from envs import CONFIGS_PATH
+from envs._GLOBAL_CONFIGS import DEBUG_EE, DEBUG_EE_MAX_STEP
 from envs.utils.create_actor import UnStableError
 from generate_episode_instructions import generate_episode_descriptions
 
@@ -714,6 +715,28 @@ def run_one_batch_episode(
                     action_type=action_type,
                     current_observation=observation,
                 )
+
+                if DEBUG_EE and robotwin_action_type == "ee":
+                    step_id = int(getattr(task_env, "take_action_cnt", 0)) + 1
+                    if step_id <= DEBUG_EE_MAX_STEP:
+                        flat = np.asarray(flat_action, dtype=np.float32).reshape(-1)
+                        left_pose = flat[:7]
+                        left_grip = flat[7:8]
+                        right_pose = flat[8:15]
+                        right_grip = flat[15:16]
+                        print(
+                            "\n[DEBUG_EE] eval step="
+                            + str(step_id)
+                            + " left_pose="
+                            + np.array2string(left_pose, precision=4, suppress_small=True)
+                            + " left_grip="
+                            + np.array2string(left_grip, precision=4, suppress_small=True)
+                            + " right_pose="
+                            + np.array2string(right_pose, precision=4, suppress_small=True)
+                            + " right_grip="
+                            + np.array2string(right_grip, precision=4, suppress_small=True)
+                        )
+
                 task_env.take_action(flat_action, action_type=robotwin_action_type)
 
                 if task_env.eval_success:

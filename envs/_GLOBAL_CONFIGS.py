@@ -12,6 +12,9 @@ CONFIGS_PATH = os.path.join(ROOT_PATH, "env_cfg/task_config/")
 SCRIPT_PATH = os.path.join(ROOT_PATH, "scripts/")
 DESCRIPTION_PATH = os.path.join(ROOT_PATH, "description/")
 
+DEBUG_EE = False
+DEBUG_EE_MAX_STEP = 5
+
 # Euler angles in world coordinates
 # t3d.euler.quat2euler(quat) returns (theta_x, theta_y, theta_z)
 # theta_y controls the pitch, and theta_z controls rotation around the axis perpendicular to the tabletop plane
