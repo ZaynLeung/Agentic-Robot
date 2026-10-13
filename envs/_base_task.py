@@ -1650,9 +1650,15 @@ class Base_Task(gym.Env):
             right_target_pose = right_arm_actions[0]
 
             if DEBUG_EE and self.take_action_cnt < DEBUG_EE_MAX_STEP:
+                left_current_pose = self.get_arm_pose("left")
+                right_current_pose = self.get_arm_pose("right")
                 print(
                     "\n[DEBUG_EE] step="
                     + str(self.take_action_cnt + 1)
+                    + " left_current_pose="
+                    + np.array2string(np.asarray(left_current_pose), precision=4, suppress_small=True)
+                    + " right_current_pose="
+                    + np.array2string(np.asarray(right_current_pose), precision=4, suppress_small=True)
                     + " left_target_pose="
                     + np.array2string(np.asarray(left_target_pose), precision=4, suppress_small=True)
                     + " right_target_pose="
